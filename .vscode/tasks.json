@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "Basic OpenGL Build",
+			"command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-I",
+				"${workspaceRoot}\\vendor",
+				"-I",
+				"${workspaceRoot}\\include",
+				"-o",
+				"${workspaceRoot}\\application.exe",
+				"${workspaceRoot}\\src\\*.cpp",
+				"-L",
+				"${workspaceRoot}\\vendor\\glfw-3.3.7_64\\lib-mingw-w64",
+				"-L",
+				"${workspaceRoot}\\vendor\\glew-2.1.0\\lib\\Release\\x64",
+				"-l",
+				"glfw3",
+				"-l",
+				"glew32s",
+				"-l",
+				"gdi32",
+				"-l",
+				"opengl32"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: C:\\msys64\\mingw64\\bin\\g++.exe"
+		}
+	]
+}
