@@ -1,9 +1,4 @@
-#ifndef OPEN_GL_UTILITY_FUNCTIONS_CPP
-#define OPEN_GL_UTILITY_FUNCTIONS_CPP
-
-#include "OpenGlHeaders.hpp"
-
-#include <iostream>
+#include "Renderer.hpp"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -64,5 +59,3 @@ void ProcessInput(GLFWwindow *window)
       glfwSetWindowShouldClose(window, true);
    }
 }
-
-#endif
