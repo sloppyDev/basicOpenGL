@@ -1,5 +1,9 @@
 #include "Renderer.hpp"
 
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
    glViewport(0, 0, width, height);
@@ -58,4 +62,33 @@ void ProcessInput(GLFWwindow *window)
    {
       glfwSetWindowShouldClose(window, true);
    }
+}
+
+Renderer::Renderer()
+{}
+Renderer::~Renderer()
+{}
+
+void Renderer::StartRender(GLFWwindow* window)
+{
+   ProcessInput(window);
+   glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+    shader.Bind();
+    va.Bind();
+    ib.Bind();
+
+    glDrawElements(GL_TRIANGLES, ib.count, GL_UNSIGNED_INT, nullptr);
+}
+
+void Renderer::FinishRender(GLFWwindow* window)
+{
+      // Swap front and back buffers
+      glfwSwapBuffers(window);
+
+      // Poll for window events
+      glfwPollEvents();
 }

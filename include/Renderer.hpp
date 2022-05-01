@@ -5,6 +5,10 @@
 
 #include <iostream>
 
+struct VertexArray;
+struct IndexBuffer;
+struct Shader;
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void APIENTRY glDebugOutput(GLenum source, 
                             GLenum type, 
@@ -14,5 +18,15 @@ void APIENTRY glDebugOutput(GLenum source,
                             const char *message, 
                             const void *userParam);
 void ProcessInput(GLFWwindow *window);
+
+struct Renderer
+{
+   Renderer();
+   ~Renderer();
+
+   void StartRender(GLFWwindow* window);
+   void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+   void FinishRender(GLFWwindow* window);
+};
 
 #endif

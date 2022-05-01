@@ -68,10 +68,6 @@ int main()
       2, 3, 0
    };
 
-   unsigned int vao;
-   glGenVertexArrays(1, &vao);
-   glBindVertexArray(vao);
-
    VertexArray va;
    VertexBuffer vb(vertices, 4*2*sizeof(float));
    VertexBufferLayout layout;
@@ -88,14 +84,13 @@ int main()
    vb.Unbind();
    ib.Unbind();
    shader.Unbind();
+   Renderer renderer;
 
    float r = 0.0f;
    float increment = 0.05f;
    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
    while (!glfwWindowShouldClose(window))
    {
-      // Inputs
-      ProcessInput(window);
 
       // Time Updates
       if (r > 1.0f || r < 0.0f)
@@ -105,20 +100,13 @@ int main()
       r += increment;
 
       // Render
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      va.Bind();
-      vb.Bind();
-      ib.Bind();
+      renderer.StartRender(window);
+      
       shader.Bind();
       shader.SetUniform4f("u_color", r, 0.3f, 0.8f, 1.0f);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+      renderer.Draw(va, ib, shader);
 
-      // Swap front and back buffers
-      glfwSwapBuffers(window);
-
-      // Poll for window events
-      glfwPollEvents();
+      renderer.FinishRender(window);
    }
 
    glfwTerminate();
