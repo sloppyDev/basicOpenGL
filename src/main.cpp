@@ -101,6 +101,9 @@ int main()
       return -1;
    }
 
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef DEBUG
    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
@@ -112,7 +115,7 @@ int main()
    }
 
    glfwMakeContextCurrent(window);
-
+   glfwSwapInterval(1);
 
    if(glewInit() != GLEW_OK)
    {
@@ -129,7 +132,6 @@ int main()
       glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
       glDebugMessageCallback(glDebugOutput, nullptr);
       glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-      std::cout << "created debug context!" << std::endl;
    }
 #endif
 
@@ -149,6 +151,10 @@ int main()
       2, 3, 0
    };
 
+   unsigned int vao;
+   glGenVertexArrays(1, &vao);
+   glBindVertexArray(vao);
+
    unsigned int buffer;
    glGenBuffers(1, &buffer);
    glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -166,15 +172,28 @@ int main()
    unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
    glUseProgram(shader);
 
+   int location = glGetUniformLocation(shader, "u_color");
+   glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f);
+
+   float r = 0.0f;
+   float increment = 0.05f;
    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
    while (!glfwWindowShouldClose(window))
    {
       // Inputs
       ProcessInput(window);
 
+      // Time Updates
+      if (r > 1.0f || r < 0.0f)
+      {
+         increment *= -1;
+      }
+      r += increment;
+
       // Render
       glClear(GL_COLOR_BUFFER_BIT);
 
+      glUniform4f(location, r, 0.3f, 0.8f, 1.0f);
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
       // Swap front and back buffers
