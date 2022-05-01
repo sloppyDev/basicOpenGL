@@ -1,9 +1,11 @@
-#include "glew-2.1.0/include/GL/glew.h"
-#include "glfw-3.3.7_64/include/GLFW/glfw3.h"
+#include "OpenGlHeaders.hpp"
+#include "OpenGlUtilityFunctions.cpp"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+#define DEBUG
 
 struct ShaderProgramSource
 {
@@ -99,7 +101,10 @@ int main()
       return -1;
    }
 
-   window = glfwCreateWindow(640, 480, "Hello, World!", NULL, NULL);
+#ifdef DEBUG
+   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+#endif
+   window = glfwCreateWindow(800, 600, "Basic OpenGL", NULL, NULL);
    if (!window)
    {
       glfwTerminate();
@@ -108,26 +113,54 @@ int main()
 
    glfwMakeContextCurrent(window);
 
+
    if(glewInit() != GLEW_OK)
    {
       std::cout << "Error!" << std::endl;
    }
-
    std::cout << glGetString(GL_VERSION) << std::endl;
 
+#ifdef DEBUG
+   int flags;
+   glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+   if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+   {
+      glEnable(GL_DEBUG_OUTPUT);
+      glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+      glDebugMessageCallback(glDebugOutput, nullptr);
+      glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+      std::cout << "created debug context!" << std::endl;
+   }
+#endif
+
+   glViewport(0, 0, 800, 600);
+   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
    // Define Vertex Buffer
-   float vertices[6] = {
+   float vertices[] = {
         -0.5f, -0.5f,
-         0.0f,  0.5f,
-         0.5f, -0.5f
+         0.5f, -0.5f,
+         0.5f,  0.5f,
+        -0.5f,  0.5f,
    };
+
+   unsigned int indices[] = {
+      0, 1, 2,
+      2, 3, 0
+   };
+
    unsigned int buffer;
    glGenBuffers(1, &buffer);
    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-   glBufferData(GL_ARRAY_BUFFER, 6*sizeof(float), vertices, GL_STATIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(float), vertices, GL_STATIC_DRAW);
 
    glEnableVertexAttribArray(0);
    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
+
+   unsigned int ibo;
+   glGenBuffers(1, &ibo);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
    ShaderProgramSource source = ParseShader("res/shaders/basic.glsl");
    unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
@@ -136,10 +169,13 @@ int main()
    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
    while (!glfwWindowShouldClose(window))
    {
+      // Inputs
+      ProcessInput(window);
+
       // Render
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
       // Swap front and back buffers
       glfwSwapBuffers(window);
@@ -147,6 +183,8 @@ int main()
       // Poll for window events
       glfwPollEvents();
    }
+
+   glfwTerminate();
    glDeleteProgram(shader);
 
    return 0;
