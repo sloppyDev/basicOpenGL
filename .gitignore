@@ -6,3 +6,6 @@
 *.html
 *.js
 *.css
+
+res/models/*
+res/textures/*

@@ -4,6 +4,7 @@
 #include "IndexBuffer.hpp"
 #include "VertexArray.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
 
 #include <iostream>
 
@@ -57,10 +58,10 @@ int main()
 
    // Define Vertex Buffer
    float vertices[] = {
-        -0.5f, -0.5f,
-         0.5f, -0.5f,
-         0.5f,  0.5f,
-        -0.5f,  0.5f,
+        -0.5f, -0.5f, 0.0f, 0.0f,
+         0.5f, -0.5f, 1.0f, 0.0f,
+         0.5f,  0.5f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f, 1.0f
    };
 
    unsigned int indices[] = {
@@ -69,16 +70,20 @@ int main()
    };
 
    VertexArray va;
-   VertexBuffer vb(vertices, 4*2*sizeof(float));
+   VertexBuffer vb(vertices, 4*4*sizeof(float));
    VertexBufferLayout layout;
+   layout.Push(GL_FLOAT, 2);
    layout.Push(GL_FLOAT, 2);
    va.AddBuffer(vb, layout);
 
    IndexBuffer ib(indices, 6);
 
-   Shader shader("res/shaders/basic.glsl");
+   Shader shader("res/shaders/texture.glsl");
    shader.Bind();
-   shader.SetUniform4f("u_color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+   Texture texture("res/textures/beaker.jpg");
+   texture.Bind();
+   shader.SetUniform1i("u_texture", 0);
 
    va.Unbind();
    vb.Unbind();
@@ -91,7 +96,6 @@ int main()
    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
    while (!glfwWindowShouldClose(window))
    {
-
       // Time Updates
       if (r > 1.0f || r < 0.0f)
       {
@@ -103,7 +107,6 @@ int main()
       renderer.StartRender(window);
       
       shader.Bind();
-      shader.SetUniform4f("u_color", r, 0.3f, 0.8f, 1.0f);
       renderer.Draw(va, ib, shader);
 
       renderer.FinishRender(window);
