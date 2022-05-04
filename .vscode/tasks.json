@@ -14,6 +14,7 @@
 				"-o",
 				"${workspaceRoot}\\application.exe",
 				"${workspaceRoot}\\src\\*.cpp",
+				"${workspaceRoot}\\src\\imgui\\*.cpp",
 				"-L",
 				"${workspaceRoot}\\vendor\\glfw-3.3.7_64\\lib-mingw-w64",
 				"-L",

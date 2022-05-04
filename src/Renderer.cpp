@@ -56,13 +56,6 @@ void APIENTRY glDebugOutput(GLenum source,
     std::cout << std::endl;
 }
 
-void ProcessInput(GLFWwindow *window)
-{
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-   {
-      glfwSetWindowShouldClose(window, true);
-   }
-}
 
 Renderer::Renderer()
 {}
@@ -71,7 +64,6 @@ Renderer::~Renderer()
 
 void Renderer::StartRender(GLFWwindow* window)
 {
-   ProcessInput(window);
    glClear(GL_COLOR_BUFFER_BIT);
 }
 

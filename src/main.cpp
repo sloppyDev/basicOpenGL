@@ -1,4 +1,7 @@
+#define DEBUG
+
 #include "OpenGlHeaders.hpp"
+#include "WindowHandler.hpp"
 #include "Renderer.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
@@ -6,55 +9,19 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
-#include <iostream>
-
-#define DEBUG
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 int main()
 {
-   GLFWwindow* window;
+   WindowHandler windowHandler;
+   windowHandler.CreateWindow();
 
-   if (!glfwInit())
-   {
-      return -1;
-   }
-
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef DEBUG
-   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-#endif
-   window = glfwCreateWindow(800, 600, "Basic OpenGL", NULL, NULL);
-   if (!window)
-   {
-      glfwTerminate();
-      return -1;
-   }
-
-   glfwMakeContextCurrent(window);
-   glfwSwapInterval(1);
-
-   if(glewInit() != GLEW_OK)
-   {
-      std::cout << "Error!" << std::endl;
-   }
-   std::cout << glGetString(GL_VERSION) << std::endl;
-
-#ifdef DEBUG
-   int flags;
-   glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-   if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-   {
-      glEnable(GL_DEBUG_OUTPUT);
-      glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-      glDebugMessageCallback(glDebugOutput, nullptr);
-      glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-   }
-#endif
-
-   glViewport(0, 0, 800, 600);
-   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+   ImGui::CreateContext();
+   ImGui_ImplGlfw_InitForOpenGL(windowHandler.window, true);
+   ImGui_ImplOpenGL3_Init("#version 130");
+   ImGui::StyleColorsDark();
 
    // Define Vertex Buffer
    float vertices[] = {
@@ -93,9 +60,13 @@ int main()
 
    float r = 0.0f;
    float increment = 0.05f;
-   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-   while (!glfwWindowShouldClose(window))
+   float clearColor[4] = {0.2f, 0.3f, 0.3f, 1.0f};
+   glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+   while (!glfwWindowShouldClose(windowHandler.window))
    {
+      windowHandler.ProcessEscape();
+      glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+
       // Time Updates
       if (r > 1.0f || r < 0.0f)
       {
@@ -104,14 +75,42 @@ int main()
       r += increment;
 
       // Render
-      renderer.StartRender(window);
+      renderer.StartRender(windowHandler.window);
+
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
       
       shader.Bind();
       renderer.Draw(va, ib, shader);
 
-      renderer.FinishRender(window);
+      static float f = 0.0f;
+      static int counter = 0;
+
+      ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+      ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+      ImGui::ColorEdit3("clear color", (float*)&clearColor); // Edit 3 floats representing a color
+
+      if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+      ImGui::SameLine();
+      ImGui::Text("counter = %d", counter);
+
+      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      ImGui::End();
+
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+      renderer.FinishRender(windowHandler.window);
    }
 
+   ImGui_ImplOpenGL3_Shutdown();
+   ImGui_ImplGlfw_Shutdown();
+   ImGui::DestroyContext();
    glfwTerminate();
 
    return 0;
