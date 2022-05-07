@@ -8,6 +8,7 @@ namespace chapter
    ChapterClearColorCherno::ChapterClearColorCherno()
       : clearColor{0.2f, 0.3f, 0.3f, 1.0f}
    {}
+
    ChapterClearColorCherno::~ChapterClearColorCherno()
    {}
 
