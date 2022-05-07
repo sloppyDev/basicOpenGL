@@ -12,8 +12,7 @@
          "args": [],
          "stopAtEntry": false,
          "cwd": "${workspaceRoot}",
-         "console": "externalTerminal",
-         "preLaunchTask": "Basic OpenGL Build"
+         "console": "externalTerminal"
       }
    ]
 }

@@ -13,6 +13,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "chapters/ChapterClearColor_cherno.hpp"
+
 int main()
 {
    WindowHandler windowHandler;
@@ -23,6 +25,11 @@ int main()
    ImGui_ImplOpenGL3_Init("#version 130");
    ImGui::StyleColorsDark();
 
+   Renderer renderer;
+
+   chapter::ChapterClearColorCherno chapter;
+
+/*
    // Define Vertex Buffer
    float vertices[] = {
         -0.5f, -0.5f, 0.0f, 0.0f,
@@ -56,31 +63,34 @@ int main()
    vb.Unbind();
    ib.Unbind();
    shader.Unbind();
-   Renderer renderer;
 
    float r = 0.0f;
    float increment = 0.05f;
+   */
    float clearColor[4] = {0.2f, 0.3f, 0.3f, 1.0f};
    glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
    while (!glfwWindowShouldClose(windowHandler.window))
    {
       windowHandler.ProcessEscape();
       glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-
+/*
       // Time Updates
       if (r > 1.0f || r < 0.0f)
       {
          increment *= -1;
       }
       r += increment;
-
+*/
       // Render
       renderer.StartRender(windowHandler.window);
+
+      chapter.Update(0.0f);
+      chapter.Render();
 
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
-      
+/*      
       shader.Bind();
       renderer.Draw(va, ib, shader);
 
@@ -101,7 +111,8 @@ int main()
 
       ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
       ImGui::End();
-
+*/
+      chapter.ImGuiRender();
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
